@@ -3,5 +3,7 @@ from django.urls import path , include
 from home import views
 
 urlpatterns = [
-    path("",views.home)
+    path("",views.sui),
+    path("home/",views.home),
+    path("dashboard/",views.dashboard),
 ]
