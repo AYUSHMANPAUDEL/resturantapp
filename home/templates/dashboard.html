@@ -6,193 +6,183 @@
     <title>Restaurant Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #FFF5E6; /* Light background to match the buttons */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr); /* Default to 8 columns */
-            gap: 10px;
-            width: 80%;
-        }
-        .table-icon {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100px;
-            background-color: #FFD580; /* Light orange */
-            border-radius: 8px;
-            cursor: pointer;
-            position: relative;
-            transition: background-color 0.3s;
-        }
-        .table-icon:hover {
-            background-color: #FF8C00; /* Dark orange */
-        }
-        .table-icon span {
-            font-size: 1.5em;
-            color: white;
-        }
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            background-color: #FFD580; /* Match light orange color */
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        .popup.visible {
-            display: block;
-        }
-        .popup-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            color: white;
-            font-size: 1.2em;
-        }
-        .menu-icons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        .menu-icon {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .pizza { background-color: #FF6347; } /* Tomato red */
-        .momo { background-color: #FFD700; } /* Gold */
-        .drinks { background-color: #1E90FF; } /* Dodger blue */
-        .burger { background-color: #32CD32; } /* Lime green */
-        .others { background-color: #8A2BE2; } /* Blue violet */
-        .menu-icon i {
-            font-size: 1.5em;
-            color: white;
-        }
+        body { font-family: Arial, sans-serif; background-color: #FFF5E6; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 80%; margin-bottom: 20px; }
+        .table-icon { display: flex; justify-content: center; align-items: center; width: 100%; height: 100px; background-color: #FFD580; border-radius: 8px; cursor: pointer; position: relative; transition: background-color 0.3s; }
+        .table-icon:hover { background-color: #FF8C00; }
+        .table-icon span { font-size: 1.5em; color: white; }
+        .popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background-color: #FFD580; padding: 20px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); border-radius: 8px; z-index: 10; }
+        .popup.visible { display: block; }
+        .popup-close { position: absolute; top: 10px; right: 10px; cursor: pointer; color: white; font-size: 1.2em; }
+        .menu-icons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .menu-icon { display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; transition: background-color 0.3s; }
+        .pizza { background-color: #FF6347; }
+        .momo { background-color: #FFD700; }
+        .drinks { background-color: #1E90FF; }
+        .burger { background-color: #32CD32; }
+        .others { background-color: #8A2BE2; }
+        .menu-icon i { font-size: 1.5em; color: white; }
+        .item-list { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px; }
+        .item { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px; background-color: white; border: 1px solid #FFD580; border-radius: 5px; cursor: pointer; }
+        .item span { font-size: 1em; }
+        .item-box-container { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .item-box { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 80px; height: 80px; background-color: #FFF5E6; border: 2px solid #FFD580; border-radius: 8px; position: relative; }
+        .item-box span { font-size: 1.2em; }
+        .item-box button { position: absolute; top: 5px; right: 5px; background: none; border: none; color: red; font-size: 1.2em; cursor: pointer; }
+        .bottom-container { display: flex; justify-content: center; align-items: center; flex-direction: column; width: 100%; position: absolute; bottom: 20px; }
+        .send-button { margin-top: 20px; padding: 10px 20px; background-color: #FF6347; color: white; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <!-- Icons for tables will be dynamically generated here -->
 </div>
 
 <div class="popup" id="popup">
     <span class="popup-close" id="popup-close">&times;</span>
-    <div class="menu-icons">
-        <div class="menu-icon pizza"><i class="fas fa-pizza-slice"></i></div>
-        <div class="menu-icon momo"><i class="fas fa-drumstick-bite"></i></div>
-        <div class="menu-icon drinks"><i class="fas fa-cocktail"></i></div>
-        <div class="menu-icon burger"><i class="fas fa-hamburger"></i></div>
-        <div class="menu-icon others"><i class="fas fa-ellipsis-h"></i></div>
+    <div class="item-list" id="item-list">
+        <!-- Items will be dynamically populated here -->
     </div>
 </div>
 
-<div class="item-popup" id="item-popup">
-    <span class="popup-close" id="item-popup-close">&times;</span>
-    <div id="item-content"></div>
+<div class="bottom-container">
+    <div class="item-box-container" id="item-box-container">
+        <!-- Items will be added here -->
+    </div>
+    <button class="send-button" id="send-button">Send</button>
 </div>
 
 <script>
+var currentURL = window.location.href;
+var baseURL = currentURL.split("/").slice(0, 3).join("/");
+var wsURL = baseURL.replace("http", "ws") + "/ws/ac";
+var ws = new WebSocket(wsURL);
+    ws.onopen = function () {
+        console.log("WebSocket connection opened");
+    }
+    ws.onerror = function (event) { 
+        console.log("WebSocket error occurred" , event);
+    }
+    ws.onmessage = function (event){
+        console.log("Message received from Server", event)
+    }
     document.addEventListener('DOMContentLoaded', () => {
-        const rows = {{ rows }};
-        const columns = {{ columns }};
-
-        const container = document.querySelector('.container');
-        container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`; // Adjust the number of columns
-
-        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const rows = 3;
+        const columns = 5;
         
+        const container = document.querySelector('.container');
+        const itemBoxContainer = document.getElementById('item-box-container');
+        const sendButton = document.getElementById('send-button');
+        const itemList = document.getElementById('item-list');
+        container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+    
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let selectedTable = '';
+    
         for (let r = 1; r <= rows; r++) {
             for (let c = 0; c < columns; c++) {
                 const tableIcon = document.createElement('div');
                 tableIcon.classList.add('table-icon');
                 tableIcon.innerHTML = `<span>${alphabet[c]}${r}</span>`;
                 tableIcon.addEventListener('click', () => {
-                    document.getElementById('popup').classList.add('visible');
+                    selectedTable = `${alphabet[c]}${r}`;
+                    showMenuIcons();
                 });
                 container.appendChild(tableIcon);
             }
         }
-
-        // Handle popup close
+    
         document.getElementById('popup-close').addEventListener('click', () => {
             document.getElementById('popup').classList.remove('visible');
         });
-
-        document.getElementById('item-popup-close').addEventListener('click', () => {
-            document.getElementById('item-popup').classList.remove('visible');
-        });
-
-        // Add event listeners to menu icons
-        const menuIcons = document.querySelectorAll('.menu-icon');
-        menuIcons.forEach(icon => {
-            icon.addEventListener('click', () => {
-                const itemType = icon.classList[1]; // Get the type of item (pizza, momo, etc.)
-                fetchItemData(itemType);
+    
+        function showMenuIcons() {
+            itemList.innerHTML = `
+                <div class="menu-icon pizza" data-type="pizza" onclick="fetchItemData('pizza')"><i class="fas fa-pizza-slice"></i></div>
+                <div class="menu-icon momo" data-type="momo" onclick="fetchItemData('momo')"><i class="fas fa-drumstick-bite"></i></div>
+                <div class="menu-icon drinks" data-type="drinks" onclick="fetchItemData('drinks')"><i class="fas fa-cocktail"></i></div>
+                <div class="menu-icon burger" data-type="burger" onclick="fetchItemData('burger')"><i class="fas fa-hamburger"></i></div>
+                <div class="menu-icon others" data-type="others" onclick="fetchItemData('others')"><i class="fas fa-ellipsis-h"></i></div>
+            `;
+            document.getElementById('popup').classList.add('visible');
+        }
+    
+        window.fetchItemData = function(type) {
+            fetch(`/get_menu_items/${type}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const items = data.items;
+                    showItemList(items);
+                });
+        }
+    
+        function showItemList(items) {
+            itemList.innerHTML = '';
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('item');
+                itemDiv.innerHTML = `<span>${item.name}</span><span>${item.price}</span>`;
+                itemDiv.addEventListener('click', () => {
+                    addItemToBox(item);
+                });
+                itemList.appendChild(itemDiv);
             });
+        }
+    
+        function addItemToBox(item) {
+            const existingItem = document.getElementById(item.name);
+            if (existingItem) {
+                const countSpan = existingItem.querySelector('.item-count');
+                const count = parseInt(countSpan.textContent.replace('x', ''), 10) + 1;
+                countSpan.textContent = `x${count}`;
+            } else {
+                const itemBox = document.createElement('div');
+                itemBox.classList.add('item-box');
+                itemBox.id = item.name;
+                itemBox.innerHTML = `
+                    <span>${item.name}</span>
+                    <span class="item-count">x1</span>
+                    <button onclick="removeItem('${item.name}')">&times;</button>
+                `;
+                itemBoxContainer.appendChild(itemBox);
+            }
+            document.getElementById('popup').classList.remove('visible');
+        }
+    
+        window.removeItem = function(itemName) {
+            const itemBox = document.getElementById(itemName);
+            if (itemBox) {
+                itemBoxContainer.removeChild(itemBox);
+            }
+        }
+    
+        sendButton.addEventListener('click', () => {
+            const items = [];
+            const itemBoxes = document.querySelectorAll('.item-box');
+            itemBoxes.forEach(box => {
+                const itemName = box.id;
+                const itemCount = parseInt(box.querySelector('.item-count').textContent.substring(1));
+                items.push({ name: itemName, count: itemCount, table: selectedTable });
+            });
+            final_item = JSON.stringify(items)
+            console.log(typeof(final_item))
+            console.log(final_item)
+            try {
+                ws.send(final_item);
+                console.log("Successfully sent your data to the chef!")
+              }
+              catch(err) {
+                console.log("failed to  send the data")
+              }
+            
+            
+
+            itemBoxContainer.innerHTML = '';
+
+             
         });
     });
-
-    function fetchItemData(type) {
-        // Simulate fetching data from the server
-        const data = {
-            pizza: [
-                { name: 'Margherita', price: '$10' },
-                { name: 'Pepperoni', price: '$12' },
-                { name: 'Veggie', price: '$11' }
-            ],
-            momo: [
-                { name: 'Chicken Momo', price: '$8' },
-                { name: 'Veg Momo', price: '$7' }
-            ],
-            drinks: [
-                { name: 'Coke', price: '$2' },
-                { name: 'Pepsi', price: '$2' },
-                { name: 'Lemonade', price: '$3' }
-            ],
-            burger: [
-                { name: 'Cheeseburger', price: '$9' },
-                { name: 'Veggie Burger', price: '$8' }
-            ],
-            others: [
-                { name: 'Fries', price: '$3' },
-                { name: 'Onion Rings', price: '$4' }
-            ]
-        };
-
-        const items = data[type];
-        const itemContent = document.getElementById('item-content');
-        itemContent.innerHTML = ''; // Clear previous content
-
-        items.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.textContent = `${item.name}: ${item.price}`;
-            itemContent.appendChild(itemElement);
-        });
-
-        document.getElementById('item-popup').classList.add('visible');
-    }
+    
 </script>
-
 </body>
 </html>
