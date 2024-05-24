@@ -1,0 +1,138 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chef Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF5E6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .orders-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+        }
+        .order-card {
+            background-color: #FFD580;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        .order-card.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .order-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .order-item span {
+            font-size: 1em;
+        }
+        @media (max-width: 600px) {
+            .orders-container {
+                padding: 10px;
+            }
+            .order-header {
+                font-size: 1em;
+            }
+            .order-item span {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+</head>
+<body>
+    <h1>Orders</h1>
+    <div class="orders-container" id="orders-container">
+        <!-- Orders will be dynamically populated here -->
+    </div>
+
+    <script>
+        const ordersContainer = document.getElementById('orders-container');
+        const notificationSound = new Howl({
+            src: ['{% static "notification.wav" %}'] 
+        });
+        const ws = new WebSocket('ws://127.0.0.1:8000/ws/ac');
+
+        ws.onopen = function () {
+            console.log("WebSocket connection opened");
+        };
+
+        ws.onerror = function (event) {
+            console.log("WebSocket error occurred", event);
+        };
+
+        ws.onmessage = function (event) {
+            console.log("Message received from server", event);
+            try {
+                const orders = JSON.parse(event.data);
+                displayOrders(orders);
+                playNotificationSound();
+            } catch (error) {
+                console.error("Error parsing the message data", error);
+            }
+        };
+
+        function displayOrders(orders) {
+            // Group orders by table
+            const ordersByTable = orders.reduce((acc, order) => {
+                if (!acc[order.table]) {
+                    acc[order.table] = [];
+                }
+                acc[order.table].push(order);
+                return acc;
+            }, {});
+
+            Object.keys(ordersByTable).forEach(table => {
+                const orderCard = document.createElement('div');
+                orderCard.classList.add('order-card');
+
+                const orderHeader = document.createElement('div');
+                orderHeader.classList.add('order-header');
+                orderHeader.innerText = `Table ${table}`;
+                orderCard.appendChild(orderHeader);
+
+                ordersByTable[table].forEach(order => {
+                    const orderItem = document.createElement('div');
+                    orderItem.classList.add('order-item');
+                    orderItem.innerHTML = `<span>${order.name}</span><span>x${order.count}</span>`;
+                    orderCard.appendChild(orderItem);
+                });
+
+                ordersContainer.insertBefore(orderCard, ordersContainer.firstChild);
+                setTimeout(() => {
+                    orderCard.classList.add('show');
+                }, 0);
+            });
+        }
+
+        function playNotificationSound() {
+            notificationSound.play();
+        }
+    </script>
+</body>
+</html>
