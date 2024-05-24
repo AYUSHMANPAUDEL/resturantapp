@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF5E6; /* Light background to match the buttons */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr); /* Default to 8 columns */
+            gap: 10px;
+            width: 80%;
+        }
+        .table-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100px;
+            background-color: #FFD580; /* Light orange */
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+        .table-icon:hover {
+            background-color: #FF8C00; /* Dark orange */
+        }
+        .table-icon span {
+            font-size: 1.5em;
+            color: white;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: #FFD580; /* Match light orange color */
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .popup.visible {
+            display: block;
+        }
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2em;
+        }
+        .menu-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .menu-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .pizza { background-color: #FF6347; } /* Tomato red */
+        .momo { background-color: #FFD700; } /* Gold */
+        .drinks { background-color: #1E90FF; } /* Dodger blue */
+        .burger { background-color: #32CD32; } /* Lime green */
+        .others { background-color: #8A2BE2; } /* Blue violet */
+        .menu-icon i {
+            font-size: 1.5em;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Icons for tables will be dynamically generated here -->
+</div>
+
+<div class="popup" id="popup">
+    <span class="popup-close" id="popup-close">&times;</span>
+    <div class="menu-icons">
+        <div class="menu-icon pizza"><i class="fas fa-pizza-slice"></i></div>
+        <div class="menu-icon momo"><i class="fas fa-drumstick-bite"></i></div>
+        <div class="menu-icon drinks"><i class="fas fa-cocktail"></i></div>
+        <div class="menu-icon burger"><i class="fas fa-hamburger"></i></div>
+        <div class="menu-icon others"><i class="fas fa-ellipsis-h"></i></div>
+    </div>
+</div>
+
+<div class="item-popup" id="item-popup">
+    <span class="popup-close" id="item-popup-close">&times;</span>
+    <div id="item-content"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rows = {{ rows }};
+        const columns = {{ columns }};
+
+        const container = document.querySelector('.container');
+        container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`; // Adjust the number of columns
+
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        
+        for (let r = 1; r <= rows; r++) {
+            for (let c = 0; c < columns; c++) {
+                const tableIcon = document.createElement('div');
+                tableIcon.classList.add('table-icon');
+                tableIcon.innerHTML = `<span>${alphabet[c]}${r}</span>`;
+                tableIcon.addEventListener('click', () => {
+                    document.getElementById('popup').classList.add('visible');
+                });
+                container.appendChild(tableIcon);
+            }
+        }
+
+        // Handle popup close
+        document.getElementById('popup-close').addEventListener('click', () => {
+            document.getElementById('popup').classList.remove('visible');
+        });
+
+        document.getElementById('item-popup-close').addEventListener('click', () => {
+            document.getElementById('item-popup').classList.remove('visible');
+        });
+
+        // Add event listeners to menu icons
+        const menuIcons = document.querySelectorAll('.menu-icon');
+        menuIcons.forEach(icon => {
+            icon.addEventListener('click', () => {
+                const itemType = icon.classList[1]; // Get the type of item (pizza, momo, etc.)
+                fetchItemData(itemType);
+            });
+        });
+    });
+
+    function fetchItemData(type) {
+        // Simulate fetching data from the server
+        const data = {
+            pizza: [
+                { name: 'Margherita', price: '$10' },
+                { name: 'Pepperoni', price: '$12' },
+                { name: 'Veggie', price: '$11' }
+            ],
+            momo: [
+                { name: 'Chicken Momo', price: '$8' },
+                { name: 'Veg Momo', price: '$7' }
+            ],
+            drinks: [
+                { name: 'Coke', price: '$2' },
+                { name: 'Pepsi', price: '$2' },
+                { name: 'Lemonade', price: '$3' }
+            ],
+            burger: [
+                { name: 'Cheeseburger', price: '$9' },
+                { name: 'Veggie Burger', price: '$8' }
+            ],
+            others: [
+                { name: 'Fries', price: '$3' },
+                { name: 'Onion Rings', price: '$4' }
+            ]
+        };
+
+        const items = data[type];
+        const itemContent = document.getElementById('item-content');
+        itemContent.innerHTML = ''; // Clear previous content
+
+        items.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.textContent = `${item.name}: ${item.price}`;
+            itemContent.appendChild(itemElement);
+        });
+
+        document.getElementById('item-popup').classList.add('visible');
+    }
+</script>
+
+</body>
+</html>
